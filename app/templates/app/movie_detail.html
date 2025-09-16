@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ movie.title }} - Details</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --primary-hover: #3a5cd8;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted: #495057;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --gradient-start: #6366f1;
+            --gradient-end: #4a6cf7;
+        }
+
+        .dark-theme {
+            --primary-color: #6c8dfa;
+            --primary-hover: #8ba4ff;
+            --secondary-color: #a0aec0;
+            --background-color: #121826;
+            --card-bg: #1a2436;
+            --text-color: #f8f9fa;
+            --text-muted: #e2e8f0;
+            --border-color: #2d3748;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            --gradient-start: #818cf8;
+            --gradient-end: #6c8dfa;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .app-title {
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--secondary-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .theme-icon {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .movie-hero {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .movie-poster-large {
+            width: 300px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            object-fit: cover;
+        }
+
+        .movie-details {
+            flex: 1;
+        }
+
+        .movie-title-large {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+
+        .movie-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(74, 108, 247, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 100px;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .overview-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .genre-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .genre-badge {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .cast-section {
+            margin-bottom: 40px;
+        }
+
+        .cast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .cast-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .cast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .cast-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .cast-info {
+            padding: 15px;
+        }
+
+        .cast-name {
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .cast-character {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.3);
+            color: white;
+        }
+
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(74, 108, 247, 0.1);
+            padding: 4px 10px;
+            border-radius: 50px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        @media (max-width: 992px) {
+            .movie-hero {
+                flex-direction: column;
+            }
+            
+            .movie-poster-large {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .app-title {
+                font-size: 1.8rem;
+            }
+            
+            .movie-meta {
+                justify-content: center;
+            }
+            
+            .movie-title-large {
+                font-size: 2rem;
+            }
+            
+            .cast-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1 class="app-title"><i class="fas fa-film me-2"></i>Movies Recommendation</h1>
+            <div class="theme-switch">
+                <i class="fas fa-sun theme-icon"></i>
+                <label class="theme-toggle">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <i class="fas fa-moon theme-icon"></i>
+            </div>
+        </div>
+
+        <div class="movie-hero">
+            {% if movie.poster %}
+                <img src="{{ movie.poster }}" class="movie-poster-large" alt="{{ movie.title }}">
+            {% else %}
+                <img src="https://via.placeholder.com/300x450/1a2436/6c8dfa?text=No+Image" class="movie-poster-large" alt="No Image">
+            {% endif %}
+            
+            <div class="movie-details">
+                <h1 class="movie-title-large">{{ movie.title }}</h1>
+                
+                <div class="movie-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Rating</span>
+                        <span class="meta-value">
+                            <span class="rating">⭐ {{ movie.rating|default:"N/A" }}/10</span>
+                        </span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Release Date</span>
+                        <span class="meta-value">{{ movie.release_date|default:"N/A" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Runtime</span>
+                        <span class="meta-value">{{ movie.runtime|default:"N/A" }} min</span>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">Overview</h3>
+                <p class="overview-text">{{ movie.overview|default:"No description available." }}</p>
+                
+                <h3 class="section-title">Genres</h3>
+                <div class="genre-badges">
+                    <p class="movie-meta"> {{ movie.genres|join:"" }}</p>
+                </div>
+            </div>
+        </div>
+
+
+        <a href="{% url 'movie_search' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Search
+        </a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Theme switching functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        const savedTheme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-theme');
+            themeToggle.checked = true;
+        }
+        
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>

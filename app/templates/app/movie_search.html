@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark-theme {
+            --primary-color: #6c8dfa;
+            --secondary-color: #a0aec0;
+            --background-color: #121826;
+            --card-bg: #1a2436;
+            --text-color: #e2e8f0;
+            --border-color: #2d3748;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--secondary-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .search-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .search-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+        }
+
+        .search-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .movie-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: var(--shadow);
+            height: 100%;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .movie-poster {
+            height: 350px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .movie-body {
+            padding: 20px;
+        }
+
+        .movie-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.25rem;
+            height: 60px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .movie-date {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .movie-overview {
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            height: 95px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            color: var(--secondary-color);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .theme-icon {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .movie-poster {
+                height: 300px;
+            }
+            p{
+                color: #ffffff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1 class="search-title"><i class="fas fa-film me-2"></i> Movie Recommendation</h1>
+            <div class="theme-switch">
+                <i class="fas fa-sun theme-icon"></i>
+                <label class="theme-toggle">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <i class="fas fa-moon theme-icon"></i>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <form method="get" class="search-form">
+                <input type="text" class="search-input" name="q" value="{{ query }}" placeholder="Enter movie name..." required>
+                <button class="search-btn" type="submit"><i class="fas fa-search me-2"></i>Search</button>
+            </form>
+        </div>
+
+        {% if movies %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for movie in movies %}
+                    <div class="col">
+                        <div class="card movie-card">
+                            {% if movie.poster %}
+                                <img src="{{ movie.poster }}" class="movie-poster" alt="{{ movie.title }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/500x750/1a2436/6c8dfa?text=No+Image" class="movie-poster" alt="No Image">
+                            {% endif %}
+                            <div class="movie-body">
+                                <h5 class="movie-title">{{ movie.title }}</h5>
+                                <p class="movie-date"><strong>Release Date:</strong> {{ movie.release_date|default:"N/A" }}</p>
+                                <p style="color: #a0aec0;"><strong style="color: #a0aec0;">Genres:</strong> {{ movie.genres|join:"" }}</p>
+                                <p class="movie-overview">{{ movie.overview|default:"No description available." }}</p>
+                                <a href="{% url 'movie_detail' movie.id %}" class="btn btn-primary mt-2">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% elif query %}
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h3>No movies found for "{{ query }}"</h3>
+                <p>Try different keywords or check your spelling</p>
+            </div>
+        {% else %}
+            <div class="no-results">
+                <i class="fas fa-film"></i>
+                <h3>Search for your favorite movies</h3>
+                <p>Enter a movie title in the search box above to get started</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Theme switching functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        const savedTheme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-theme');
+            themeToggle.checked = true;
+        }
+        
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
